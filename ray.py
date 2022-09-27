@@ -1,6 +1,7 @@
 from lib import *
 from sphere import *
 from math import *
+import random
 
 class Raytracer (object):
     def __init__ (self, width, height):
@@ -9,6 +10,7 @@ class Raytracer (object):
         self.background_color = color(0,0,0)
         self.current_color = color(255,255,255)
         self.scene = []
+        self.dense = 1
         self.clear()
 
     def clear(self):
@@ -56,12 +58,14 @@ class Raytracer (object):
 
         for y in range(self.height):
             for x in range(self.width):
-                i = ((2 * (x + 0.5) / self.width) - 1) * ar * tana
-                j = (1 - 2 * (y + 0.5) / self.height) * tana
-
-                direction = V3(i, j, -1).norm()
-                origin = V3(0,0,0)
-
-                c = self.cast_ray(origin, direction)
-
-                self.point(x, y, c)
+                r = random.uniform(0,1)
+                if r < self.dense:
+                    i = ((2 * (x + 0.5) / self.width) - 1) * ar * tana
+                    j = (1 - 2 * (y + 0.5) / self.height) * tana
+    
+                    direction = V3(i, j, -1).norm()
+                    origin = V3(0,0,0)
+    
+                    c = self.cast_ray(origin, direction)
+    
+                    self.point(x, y, c)
