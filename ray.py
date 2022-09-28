@@ -26,33 +26,30 @@ class Raytracer (object):
 
     #rayo inifinitio
     def cast_ray(self, origin, direction):
+        material = self.scene_intersect(origin, direction)
 
-        for sphere in self.scene:
-            intersection = sphere.ray_intersect(origin, direction)
-            if intersection:
-                return sphere.color
+        if material:
+            return material.diffuse
+        else:
+            return self.background_color
 
-        return self.background_color
+    def scene_intersect(self, origin, direction):
+        zbuffer = 999999
+        material = None
+        
+        for o in self.scene:
+            intersect = o.ray_intersect(origin, direction)
+            if intersect:
+                if intersect.distance < zbuffer:
+                    zbuffer = intersect.distance
+                    material = o.material
+        return material
 
 
     def render (self):
         fov = int(pi/2)  #apertura del angulo de la camara
         ar = self.width/self.height #aspect ratio
         tana = tan(fov/2) #tan del angulo de la camara
-
-        #creacion esferas
-        self.scene.append(Sphere(V3(0.5,-3,-14), 0.2, color(64, 207, 255)))
-        self.scene.append(Sphere(V3(-0.5,-3,-14), 0.2, color(64, 207, 255)))
-
-        self.scene.append(Sphere(V3(0,0.8,-14), 0.3, color(166,96,206)))
-        self.scene.append(Sphere(V3(0,0,-14), 0.3, color(83,153,176)))
-        self.scene.append(Sphere(V3(0,-0.8,-14), 0.3, color(0,210,146)))
-
-        self.scene.append(Sphere(V3(0,4,-14), 2.5, color(255,255,255)))
-        self.scene.append(Sphere(V3(0,0,-14), 2, color(255,255,255)))
-        self.scene.append(Sphere(V3(0,-3,-14), 1.5, color(255,255,255)))
-
-
 
         for y in range(self.height):
             for x in range(self.width):
