@@ -6,12 +6,16 @@ white = Material(diffuse=color(255,255,255))
 
     
 r = Raytracer(800,800)
+r.light = Light(
+    position = V3(0,0,0),
+    intensity = 1
+)
 r.scene = [
     Sphere(V3(-3,0,-16), 2, red),
-    Sphere(V3(-2.8,0,-10), 2, white)
+    Sphere(V3(-5,0,-10), 2, white)
 ]
 
-r.dense = 0.3
+r.dense = 1
 r.point(100,100)
 r.render()
 

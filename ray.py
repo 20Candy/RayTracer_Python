@@ -1,5 +1,7 @@
+from code import interact
 import random
 from lib import *
+from light import Light
 from sphere import *
 from math import *
 
@@ -10,6 +12,7 @@ class Raytracer (object):
         self.background_color = color(0,0,0)
         self.current_color = color(255,255,255)
         self.scene = []
+        self.light = None
         self.clear()
 
     def clear(self):
@@ -27,24 +30,40 @@ class Raytracer (object):
 
     #rayo inifinitio
     def cast_ray(self, origin, direction):
-        material = self.scene_intersect(origin, direction)
+        material, intersect = self.scene_intersect(origin, direction)
 
-        if material:
-            return material.diffuse
-        else:
+        if material is None:
             return self.background_color
+
+        light_direction = norm(sub(self.light.position, intersect.point))
+        intensity = dot(light_direction, intersect.normal)
+    
+        if intensity < 0:
+            return self.background_color
+
+        else:
+            diffuse = color(
+                int(material.diffuse[2] * intensity),
+                int(material.diffuse[1] * intensity),
+                int(material.diffuse[0] * intensity)
+            )
+            return diffuse
+
 
     def scene_intersect(self, origin, direction):
         zbuffer = 999999
         material = None
+        intersect = None
         
         for o in self.scene:
-            intersect = o.ray_intersect(origin, direction)
-            if intersect:
-                if intersect.distance < zbuffer:
-                    zbuffer = intersect.distance
+            object_intersect = o.ray_intersect(origin, direction)
+            if object_intersect:
+                if object_intersect.distance < zbuffer:
+                    zbuffer = object_intersect.distance
                     material = o.material
-        return material
+                    intersect = object_intersect
+
+        return material, intersect
 
 
     def render (self):

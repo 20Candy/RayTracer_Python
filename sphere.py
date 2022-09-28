@@ -28,8 +28,13 @@ class Sphere(object):
         if t1 < 0:
             return None
 
+        impact_point = sum(orig, mul(dir, t0))
+        normal = norm(sub(impact_point, self.center))
+
         return Intersect(
-            distance = t0
+            distance = t0,
+            point = impact_point,
+            normal = normal
         )
 
 
