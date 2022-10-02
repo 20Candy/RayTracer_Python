@@ -1,6 +1,7 @@
 from lib import *
 from sphere import *
 from math import *
+from color import *
 
 class Raytracer (object):
     def __init__ (self, width, height):
@@ -26,33 +27,49 @@ class Raytracer (object):
 
     #rayo inifinitio
     def cast_ray(self, origin, direction):
+        material, intersect = self.scene_intersect(origin, direction)
 
-        for sphere in self.scene:
-            intersection = sphere.ray_intersect(origin, direction)
-            if intersection:
-                return sphere.color
+        if material is None:
+            return self.background_color
 
-        return self.background_color
+        light_direction = norm(sub(self.light.position, intersect.point))
+    
+        #diffuse component
+        diffuse_internsity = dot(light_direction, intersect.normal)
+        diffuse = material.diffuse * diffuse_internsity * material.albedo[0]
+
+        #specular component
+        light_direction = reflect(light_direction, intersect.normal)
+        reflecion_internsity = max(0,dot(light_direction, direction))
+        specular_intensity =  self.light.intensity * reflecion_internsity ** material.spec
+
+        specular = self.light.color * specular_intensity * material.albedo[1]
+
+        return diffuse + specular
+    
+
+    def scene_intersect(self, origin, direction):
+        zbuffer = 999999
+        material = None
+        intersect = None
+        
+        for o in self.scene:
+            object_intersect = o.ray_intersect(origin, direction)
+            if object_intersect:
+                if object_intersect.distance < zbuffer:
+                    zbuffer = object_intersect.distance
+                    material = o.material
+                    intersect = object_intersect
+
+        return material, intersect
+
+    
 
 
     def render (self):
         fov = int(pi/2)  #apertura del angulo de la camara
         ar = self.width/self.height #aspect ratio
         tana = tan(fov/2) #tan del angulo de la camara
-
-        #creacion esferas
-        self.scene.append(Sphere(V3(0.5,-3,-14), 0.2, color(64, 207, 255)))
-        self.scene.append(Sphere(V3(-0.5,-3,-14), 0.2, color(64, 207, 255)))
-
-        self.scene.append(Sphere(V3(0,0.8,-14), 0.3, color(166,96,206)))
-        self.scene.append(Sphere(V3(0,0,-14), 0.3, color(83,153,176)))
-        self.scene.append(Sphere(V3(0,-0.8,-14), 0.3, color(0,210,146)))
-
-        self.scene.append(Sphere(V3(0,4,-14), 2.5, color(255,255,255)))
-        self.scene.append(Sphere(V3(0,0,-14), 2, color(255,255,255)))
-        self.scene.append(Sphere(V3(0,-3,-14), 1.5, color(255,255,255)))
-
-
 
         for y in range(self.height):
             for x in range(self.width):
