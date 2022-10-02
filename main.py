@@ -19,6 +19,7 @@ r.light = Light(
     intensity = 2, 
     color = color(255,255,255)
 )
+
 r.scene = [
     Sphere(V3(-2,-2,-9), 2, white), #face
     Sphere(V3(-1.8,-1.8,-7.8), 0.95, white), #mouth
@@ -56,8 +57,7 @@ r.scene = [
 
     Sphere(V3(5.55,-2.2,-7.15), 0.2, black),  #eye
     Sphere(V3(3.7,-2.2,-7.2), 0.2, black),  #eye
-
-    
+   
 ]
 
 r.dense = 1
