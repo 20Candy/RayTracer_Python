@@ -1,8 +1,7 @@
-from ray import *
-<<<<<<< Updated upstream
-    
+from ray import * 
+from material import *
+from light import *
 r = Raytracer(800,800)
-=======
 from color import *
 
 white = Material(diffuse=color(255,255,255), albedo= [1, 0], spec=0)
@@ -62,7 +61,6 @@ r.scene = [
 ]
 
 r.dense = 1
->>>>>>> Stashed changes
 r.point(100,100)
 r.render()
 
