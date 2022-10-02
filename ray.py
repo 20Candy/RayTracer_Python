@@ -1,6 +1,7 @@
 from lib import *
 from sphere import *
 from math import *
+from color import *
 
 class Raytracer (object):
     def __init__ (self, width, height):
@@ -26,6 +27,7 @@ class Raytracer (object):
 
     #rayo inifinitio
     def cast_ray(self, origin, direction):
+<<<<<<< Updated upstream
 
         for sphere in self.scene:
             intersection = sphere.ray_intersect(origin, direction)
@@ -33,6 +35,43 @@ class Raytracer (object):
                 return sphere.color
 
         return self.background_color
+=======
+        material, intersect = self.scene_intersect(origin, direction)
+
+        if material is None:
+            return self.background_color
+
+        light_direction = norm(sub(self.light.position, intersect.point))
+    
+        #diffuse component
+        diffuse_internsity = dot(light_direction, intersect.normal)
+        diffuse = material.diffuse * diffuse_internsity * material.albedo[0]
+
+        #specular component
+        light_direction = reflect(light_direction, intersect.normal)
+        reflecion_internsity = max(0,dot(light_direction, direction))
+        specular_intensity =  self.light.intensity * reflecion_internsity ** material.spec
+
+        specular = self.light.color * specular_intensity * material.albedo[1]
+
+        return diffuse + specular
+    
+
+    def scene_intersect(self, origin, direction):
+        zbuffer = 999999
+        material = None
+        intersect = None
+        
+        for o in self.scene:
+            object_intersect = o.ray_intersect(origin, direction)
+            if object_intersect:
+                if object_intersect.distance < zbuffer:
+                    zbuffer = object_intersect.distance
+                    material = o.material
+                    intersect = object_intersect
+
+        return material, intersect
+>>>>>>> Stashed changes
 
 
     def render (self):
